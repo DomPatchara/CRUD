@@ -1,6 +1,6 @@
 import { getAllClient, createClient, updateClient, deleteClient, searchClients } from '../services/clientServices.js'
 
-// Controller : All logic Function, ex ดึงข้อมูล, ส่ง response, เช็คเงื่อนไข...
+// Controller : ประสานงาน --> ใช้ logic จาก services , รับ request /ส่ง response, เช็คเงื่อนไข ดักจับError...
 
 
 // Get All Data
