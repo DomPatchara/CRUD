@@ -13,38 +13,49 @@ import { useEffect, useState } from "react";
 import { getClients, deleteClient } from "../api/clientApi";
 import ModalDelete from "./ModalDelete";
 import toast from "react-hot-toast";
+import { useClientStore } from "../stores/useClientStore";
 
-const TableList = ({ handleOpen, clients, setClients, setUser, selectedId, setSelectedId, searchTerm }) => {
+const TableList = () => {
   const [open, setOpen] = useState(false);
-  
 
-  const fetchData = async () => {
-    const result = await getClients();
-    console.log(result);
-    setClients(result);
-  };
+  const {
+    searchTerm,
+    selectedId,
+    setSelectedId,
+    setUser,
+    setIsOpen,
+    setModalMode,
+    clients,
+    setClients,
+  } = useClientStore();
 
   // First Render --->  Get All Data from Postgres
   useEffect(() => {
+    const fetchData = async () => {
+      const result = await getClients();
+      console.log("API result", result);
+      setClients(result);
+    };
+
     fetchData();
   }, []);
 
   // Filter Data by SearchTerm
-    const filterClients = clients.filter((client) => 
-    client.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    client.job.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    client.email.toLowerCase().includes(searchTerm.toLowerCase())  
-  ) 
-
+  const filterClients = clients.filter(
+    (client) =>
+      client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.job.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // Open Edit Modal
   const handleEditClick = (id) => {
-    handleOpen("edit");
+    setIsOpen(true);
+    setModalMode("edit");
     setSelectedId(id);
-    const client = clients.find((c) => c.id === id)
+    const client = clients.find((c) => c.id === id);
     setUser(client);
-  }
-
+  };
 
   // Open Delete Modal
   const handleDeleteClick = (id) => {
@@ -56,8 +67,12 @@ const TableList = ({ handleOpen, clients, setClients, setUser, selectedId, setSe
   const handleDelete = async () => {
     try {
       await deleteClient(selectedId);
-      setClients((prev) => prev.filter((c) => c.id !== selectedId));
-      toast.success("deleted");
+      
+      // Re-fetch new update data from backend
+      const newUpdate = await getClients(); 
+      setClients(newUpdate);
+
+      toast.success("Deleted !! ");
     } catch (error) {
       console.error("Delete error!", error);
       toast.error("Someting went wrong !");
@@ -68,7 +83,6 @@ const TableList = ({ handleOpen, clients, setClients, setUser, selectedId, setSe
 
   return (
     <div className="px-8">
-
       {/** Modal Makesure for Delete  */}
       <ModalDelete
         isOpen={open}
@@ -139,7 +153,6 @@ const TableList = ({ handleOpen, clients, setClients, setUser, selectedId, setSe
           </TableBody>
         </Table>
       </TableContainer>
-
     </div>
   );
 };

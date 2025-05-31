@@ -5,7 +5,7 @@ const API_BASE = 'http://localhost:3000/api/clients';
 // GET all clients
 export const getClients = async()=> {
     try {
-        const { data } = await axios.get(API_BASE);
+        const  { data } = await axios.get(API_BASE);
         return data
     } catch (error) {
         console.error("Error fetching clients:", error);

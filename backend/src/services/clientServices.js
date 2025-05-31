@@ -1,5 +1,7 @@
 import db from "../../db.js";
 
+// Services ---> All complex "main logic" for backend : This case is [ Create/Read/Update/Delete ]
+
 export const getAllClient = async () => {
   const { rows } = await db.query("SELECT * FROM clients_tb");
   return rows;

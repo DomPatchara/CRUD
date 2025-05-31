@@ -1,22 +1,20 @@
 import { CiCirclePlus } from "react-icons/ci";
+import { useClientStore } from "../stores/useClientStore";
 
-const Navbar = ({ handleOpen, setUser, onSearch }) => {
+const Navbar = () => {
+
+
+  const { setSearchTerm, setIsOpen, setModalMode } = useClientStore();
+
+
   const handleSearchTerm = (e) => {
     e.preventDefault();
-    onSearch(e.target.value);
+    setSearchTerm(e.target.value);
   };
 
   const handleAdd = () => {
-    handleOpen("add");
-    setUser([
-      {
-        name: "",
-        email: "",
-        job: "",
-        rate: "",
-        isactive: "",
-      },
-    ]);
+    setIsOpen(true);
+    setModalMode("add");
   };
 
   return (

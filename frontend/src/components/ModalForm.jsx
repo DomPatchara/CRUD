@@ -7,12 +7,21 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import { FormControl } from "@mui/material";
 import InputLabel from "@mui/material/InputLabel";
-import {getClients, postClient, updateClient } from "../api/clientApi";
+import { getClients, postClient, updateClient } from "../api/clientApi";
 import toast from "react-hot-toast";
+import { useClientStore } from "../stores/useClientStore";
 
-
-
-const ModalForm = ({ modalMode, isOpen, onClose, setClients, user, setUser, selectedId }) => {
+const ModalForm = () => {
+  const {
+    selectedId,
+    user,
+    setUser,
+    clearInput,
+    isOpen,
+    setIsOpen,
+    modalMode,
+    setClients,
+  } = useClientStore();
 
   // Destructure State Input
   const { name, email, job, rate, isactive } = user;
@@ -20,7 +29,7 @@ const ModalForm = ({ modalMode, isOpen, onClose, setClients, user, setUser, sele
   // onChange Input
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUser((prev) => ({ ...prev, [name]: value }));
+    setUser({ ...user, [name]: value });
   };
 
   // Submit Form
@@ -28,37 +37,30 @@ const ModalForm = ({ modalMode, isOpen, onClose, setClients, user, setUser, sele
     e.preventDefault();
 
     try {
-      if(modalMode === 'add') {
+      if (modalMode === "add") {
         await postClient(user);
+        toast.success("Added Success");
       } else {
-        await updateClient(selectedId, user)
+        await updateClient(selectedId, user);
+        toast.success("Updated Success");
       }
 
-      const newUpdate = await getClients(); // fetch new update from backend
+      const newUpdate = await getClients(); // Re-fetch new update data from backend
       setClients(newUpdate);
-      toast.success("Added Success")
 
       // clear input
-      setUser([
-        {
-          name: "",
-          email: "",
-          job: "",
-          rate: "",
-          isactive: "",
-        },
-      ]);
+      clearInput();
     } catch (error) {
       console.error("Submit error:", error);
       toast.error("Something went wrong !");
     } finally {
-      onClose();
+      setIsOpen(false);
     }
   };
 
   return (
     <>
-      <Modal open={isOpen} onClose={onClose}>
+      <Modal open={isOpen} onClose={() => setIsOpen(false)}>
         <Box className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] border rounded-2xl  bg-gray-300 shadow-2xl p-4">
           {/** Head Title */}
           <Typography
@@ -77,7 +79,7 @@ const ModalForm = ({ modalMode, isOpen, onClose, setClients, user, setUser, sele
               label="Name"
               variant="outlined"
               fullWidth
-              value={name || ''}
+              value={name || ""}
               onChange={handleChange}
             />
             <TextField
@@ -85,7 +87,7 @@ const ModalForm = ({ modalMode, isOpen, onClose, setClients, user, setUser, sele
               label="Email"
               variant="outlined"
               fullWidth
-              value={email || ''}
+              value={email || ""}
               onChange={handleChange}
             />
             <TextField
@@ -93,7 +95,7 @@ const ModalForm = ({ modalMode, isOpen, onClose, setClients, user, setUser, sele
               label="Job"
               variant="outlined"
               fullWidth
-              value={job || ''}
+              value={job || ""}
               onChange={handleChange}
             />
             <div className="flex gap-2">
@@ -102,7 +104,7 @@ const ModalForm = ({ modalMode, isOpen, onClose, setClients, user, setUser, sele
                 label="Rate"
                 variant="outlined"
                 sx={{ width: "50%" }}
-                value={rate || ''}
+                value={rate || ""}
                 onChange={handleChange}
               />
               <FormControl sx={{ width: "50%" }}>
@@ -110,7 +112,7 @@ const ModalForm = ({ modalMode, isOpen, onClose, setClients, user, setUser, sele
                 <Select
                   name="isactive"
                   label="Status"
-                  value={isactive || ''}
+                  value={isactive || ""}
                   onChange={handleChange}
                 >
                   <MenuItem value="true">Active</MenuItem>
